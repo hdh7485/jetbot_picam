@@ -2,9 +2,9 @@
 Detect color object on Nvidia Jetbot.
 
 # Result
-![image](./docs/images/detection_result.png)
+![image](./docs/images/result.png)
 
 # TODO
 - [ ] Publish vision_msgs.BoundingBoxArray
-- [ ] Make a launch file
+- [x] Make a launch file
 - [ ] Describe How To Use
