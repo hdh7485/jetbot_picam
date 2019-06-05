@@ -1,0 +1,6 @@
+<launch>
+	<node pkg="cam_pi"	type="cam_pi.py"	name="cam_pi" />
+	<node pkg="ads_b_read"	type="ads_b_read_node"	name="ads_b_read" />
+	<node pkg="mavros"	type="mavros_node"	name="mavros" />
+
+</launch>
