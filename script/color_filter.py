@@ -13,7 +13,15 @@ import numpy as np
 class image_converter:
 
     def __init__(self):
-        self.image_pub = rospy.Publisher("image_topic_2", Image)
+        self.lower_h = rospy.get_param('~lower_h', 100)
+        self.lower_s = rospy.get_param('~lower_s', 130)
+        self.lower_v = rospy.get_param('~lower_v', 130)
+        self.higher_h = rospy.get_param('~higher_h', 150)
+        self.higher_s = rospy.get_param('~higher_s', 255)
+        self.higher_v = rospy.get_param('~higher_v', 255)
+        self.image_pub = rospy.Publisher("inrange_image", Image, queue_size=5)
+
+        rospy.loginfo("%d %d %d", self.lower_h, self.lower_s, self.lower_v)
 
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/cam_pi", Image, self.callback)
@@ -35,9 +43,9 @@ class image_converter:
             small_image = cv2.resize(cv_image, None, fx=0.5, fy=0.5)
             hsv = cv2.cvtColor(small_image, cv2.COLOR_BGR2HSV)
 
-            lower_blue = np.array([100, 130, 130])
-            upper_blue = np.array([150, 255, 255])
-            mask = cv2.inRange(hsv, lower_blue, upper_blue)
+            lower_color = np.array([self.lower_h, self.lower_s, self.lower_v])
+            upper_color = np.array([self.higher_h, self.higher_s, self.higher_v])
+            mask = cv2.inRange(hsv, lower_color, upper_color)
             mask = cv2.erode(mask, None, iterations=2)
             mask = cv2.dilate(mask, None, iterations=2)
 
@@ -70,8 +78,8 @@ class image_converter:
             print(e)
 
 def main(args):
-    ic = image_converter()
     rospy.init_node('image_converter', anonymous=True)
+    ic = image_converter()
     try:
         rospy.spin()
     except KeyboardInterrupt:
