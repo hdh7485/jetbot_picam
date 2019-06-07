@@ -5,8 +5,8 @@ import sys
 import rospy
 import cv2
 import imutils
-from std_msgs.msg import String
 from sensor_msgs.msg import Image
+from vision_msgs.msg import BoundingBox2D
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 
@@ -20,6 +20,7 @@ class image_converter:
         self.higher_s = rospy.get_param('~higher_s', 255)
         self.higher_v = rospy.get_param('~higher_v', 255)
         self.image_pub = rospy.Publisher("inrange_image", Image, queue_size=5)
+        self.bounding_box_pub= rospy.Publisher("bounding_box", BoundingBox2D, queue_size=5)
 
         rospy.loginfo("%d %d %d", self.lower_h, self.lower_s, self.lower_v)
 
@@ -53,27 +54,27 @@ class image_converter:
             cnts = imutils.grab_contours(cnts)
             center = None
 
-            # only proceed if at least one contour was found
             if len(cnts) > 0:
-            # find the largest contour in the mask, then use
-            # it to compute the minimum enclosing circle and
-            # centroid
                 c = max(cnts, key=cv2.contourArea)
                 ((x, y), radius) = cv2.minEnclosingCircle(c)
                 M = cv2.moments(c)
                 center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
 
-                # only proceed if the radius meets a minimum size
                 if radius > 10:
-                # draw the circle and centroid on the frame,
-                # then update the list of tracked points
                     cv2.circle(mask, (int(x), int(y)), int(radius), 100, 2)
                     cv2.circle(mask, center, 5, 250, -1)
                     x,y,w,h = cv2.boundingRect(c)
                     cv2.rectangle(mask, (x,y), (x+w,y+h), 200, 10)
 
+                    bounding_box_msg = BoundingBox2D()
+                    bounding_box_msg.center.x = int(x)
+                    bounding_box_msg.center.y = int(y)
+                    bounding_box_msg.size_x = int(w)
+                    bounding_box_msg.size_y = int(h)
+
             self.image_pub.publish(self.bridge.cv2_to_imgmsg(mask, "mono8"))
-            rospy.loginfo("publish")
+            self.bounding_box_pub.publish(bounding_box_msg)
+
         except CvBridgeError as e:
             print(e)
 
