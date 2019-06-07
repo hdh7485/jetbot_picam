@@ -18,8 +18,3 @@ Detect color object on Nvidia Jetbot. The color area is classified as HSV and th
 
 # Result
 ![image](./docs/images/result.png)
-
-# TODO
-- [x] Publish vision_msgs.BoundingBoxArray
-- [x] Make a launch file
-- [x] Describe How To Use
