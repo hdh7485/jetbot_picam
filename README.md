@@ -16,5 +16,16 @@ Detect color object on Nvidia Jetbot. The color area is classified as HSV and th
 - higher_s (int)
 - higher_v (int)
 
+# Tutorial
+```
+$ cd {your_ROS_workspace}/src
+$ git clone https://github.com/hdh7485/jetbot_picam.git
+$ cd ../
+$ source devel/setup.bash
+$ rospack profile
+$ rosdep install -ary
+$ roslaunch jetbot_picam color_detector.launch
+```
+
 # Result
 ![image](./docs/images/result.png)
