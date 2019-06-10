@@ -61,19 +61,19 @@ class image_converter:
                 center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
 
                 if radius > 10:
+                    bounding_box_msg = BoundingBox2D()
                     cv2.circle(mask, (int(x), int(y)), int(radius), 100, 2)
                     cv2.circle(mask, center, 5, 250, -1)
                     x,y,w,h = cv2.boundingRect(c)
                     cv2.rectangle(mask, (x,y), (x+w,y+h), 200, 10)
 
-                    bounding_box_msg = BoundingBox2D()
                     bounding_box_msg.center.x = int(x)
                     bounding_box_msg.center.y = int(y)
                     bounding_box_msg.size_x = int(w)
                     bounding_box_msg.size_y = int(h)
 
+                    self.bounding_box_pub.publish(bounding_box_msg)
             self.image_pub.publish(self.bridge.cv2_to_imgmsg(mask, "mono8"))
-            self.bounding_box_pub.publish(bounding_box_msg)
 
         except CvBridgeError as e:
             print(e)
